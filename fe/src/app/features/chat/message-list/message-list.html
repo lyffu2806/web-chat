@@ -1,0 +1,90 @@
+<div class="messages-layout">
+
+  <!-- Danh sách conversation bên trái -->
+  <div class="conv-list">
+    <div class="conv-header">💬 Tin nhắn</div>
+    <div *ngIf="conversations.length === 0" class="empty">Chưa có cuộc trò chuyện nào</div>
+    <div
+      class="conv-item"
+      *ngFor="let c of conversations"
+      (click)="openChat(c.user)"
+      [class.active]="activeUser?.id === c.user.id"
+    >
+      <div class="avatar-wrap">
+        <div class="avatar">{{ c.user.username[0].toUpperCase() }}</div>
+        <span class="online-dot" *ngIf="c.user.isOnline"></span>
+      </div>
+      <div class="conv-info">
+        <p class="conv-name">{{ c.user.username }}</p>
+        <p class="conv-last">{{ c.lastMessage.content }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chatbox bên phải -->
+  <div class="chatbox" *ngIf="activeUser; else noChat">
+
+    <!-- Header -->
+    <div class="chat-header">
+      <button class="back-btn" (click)="closeChat()">←</button>
+      <div class="avatar-wrap">
+        <div class="avatar">{{ activeUser.username[0].toUpperCase() }}</div>
+        <span class="online-dot" *ngIf="activeUser.isOnline"></span>
+      </div>
+      <div class="header-info">
+        <p class="chat-name">{{ activeUser.username }}
+          <span class="status-badge off" *ngIf="!activeUser.isOnline">OFF</span>
+          <span class="status-badge on" *ngIf="activeUser.isOnline">ON</span>
+        </p>
+        <p class="chat-status" *ngIf="activeUser.isOnline">Đang hoạt động</p>
+        <p class="chat-status" *ngIf="!activeUser.isOnline">Ngoại tuyến</p>
+      </div>
+      <button class="menu-btn">☰</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages">
+      <div
+        class="msg-row"
+        *ngFor="let m of messages"
+        [class.mine]="m.senderId === currentUserId"
+        [class.theirs]="m.senderId !== currentUserId"
+      >
+        <div class="avatar small" *ngIf="m.senderId !== currentUserId">
+          {{ activeUser.username[0].toUpperCase() }}
+        </div>
+        <div class="msg-content">
+          <div class="bubble">{{ m.content }}</div>
+          <span class="time">{{ m.createdAt | date:'d \'Ngày Trước\'' }}</span>
+        </div>
+      </div>
+      <div #msgEnd></div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input">
+      <textarea
+        [(ngModel)]="newMessage"
+        placeholder="Nhập tin nhắn..."
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+        rows="3"
+      ></textarea>
+      <div class="input-actions">
+        <button class="send-btn" (click)="sendMessage()">✈ Gửi</button>
+        <div class="extra-btns">
+          <button>😊</button>
+          <button>🖼</button>
+          <button>🎬</button>
+          <button>🎵</button>
+          <button>🎤</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #noChat>
+    <div class="no-chat">Chọn một cuộc trò chuyện để bắt đầu</div>
+  </ng-template>
+
+</div>

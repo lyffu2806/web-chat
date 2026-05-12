@@ -1,0 +1,31 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h1>Đăng ký</h1>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" formControlName="username" placeholder="Tên người dùng" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" formControlName="email" placeholder="email@example.com" />
+      </div>
+      <div class="field">
+        <label>Mật khẩu</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+      </div>
+      <button type="submit" [disabled]="form.invalid">Đăng ký</button>
+    </form>
+    <p class="switch">Đã có tài khoản? <a routerLink="/auth/login">Đăng nhập</a></p>
+  </div>
+</div>
+
+<!-- Dialog -->
+<div class="dialog-overlay" *ngIf="showError" (click)="closeError()">
+  <div class="dialog-box" (click)="$event.stopPropagation()">
+    <div class="dialog-icon">⚠️</div>
+    <h3>Đăng ký thất bại</h3>
+    <p>{{ errorMessage }}</p>
+    <button class="dialog-btn" (click)="closeError()">Đóng</button>
+  </div>
+</div>

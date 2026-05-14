@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
@@ -9,6 +10,7 @@ import { Message } from './messages/message.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -19,6 +21,7 @@ import { Message } from './messages/message.entity';
       database: process.env.DB_NAME || 'chatting',
       entities: [User, Message],
       synchronize: true, // chỉ dùng khi dev
+      ssl: { rejectUnauthorized: false },
     }),
     AuthModule,
     UsersModule,

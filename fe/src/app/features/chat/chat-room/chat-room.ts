@@ -25,25 +25,56 @@ export class ChatRoom implements OnInit, OnDestroy {
   loading = false;
   user$ = this.store.select((s: any) => s.auth.user);
   heartbeatInterval: any;
+  currentUser: { username: string } | null = null;
 
   ngOnInit() {
+    this.loadCurrentUser();
     this.loadUsers();
     this.startHeartbeat();
   }
 
+  loadCurrentUser() {
+    this.store
+      .select((s: any) => s.auth.user)
+      .subscribe((user) => {
+        if (user) {
+          this.currentUser = user;
+        } else {
+          const token = localStorage.getItem('token');
+          if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            // Gọi API lấy username thật
+            this.http
+              .get<any>(`${environment.apiUrl}/users/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .subscribe((res) => {
+                this.currentUser = { username: res.username };
+              });
+          }
+        }
+      });
+  }
+
   startHeartbeat() {
-    const token = localStorage.getItem('token');
-    this.heartbeatInterval = setInterval(() => {
+    const sendHeartbeat = () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
       this.http
         .post(
           `${environment.apiUrl}/auth/heartbeat`,
           {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
+          { headers: { Authorization: `Bearer ${token}` } },
         )
         .subscribe();
-    }, 30000);
+    };
+
+    sendHeartbeat();
+    this.heartbeatInterval = setInterval(sendHeartbeat, 60000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') sendHeartbeat();
+    });
   }
 
   loadUsers() {

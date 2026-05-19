@@ -71,7 +71,7 @@ export class UsersService {
 
   @Cron('*/30 * * * * *')
   async checkOfflineUsers() {
-    const threshold = new Date(Date.now() - 60000);
+    const threshold = new Date(Date.now() - 2 * 60 * 1000);
     await this.usersRepository
       .createQueryBuilder()
       .update(User)

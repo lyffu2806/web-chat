@@ -7,6 +7,7 @@ import { User } from './users/user.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MessagesModule } from './messages/messages.module';
 import { Message } from './messages/message.entity';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Message } from './messages/message.entity';
     AuthModule,
     UsersModule,
     MessagesModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

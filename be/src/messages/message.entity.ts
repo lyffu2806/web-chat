@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity('messages')
@@ -18,8 +25,14 @@ export class Message {
   @Column({ default: false })
   isRead!: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
+
+  @Column({ default: 'text' })
+  type!: string; // 'text' | 'image' | 'video' | 'audio' | 'sticker'
+
+  @Column({ nullable: true })
+  fileUrl!: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'senderId' })

@@ -1,55 +1,34 @@
-<div class="layout">
-  <aside class="sidebar">
-    <div class="logo">💬 ChatApp</div>
-    <nav>
-      <a class="nav-item active" routerLink="/chat"> <span class="icon">🏠</span> Trang chủ </a>
-      <a class="nav-item" routerLink="/chat/messages"> <span class="icon">✉️</span> Nhắn tin </a>
-      <a class="nav-item" routerLink="/chat/profile"> <span class="icon">👤</span> Cá nhân </a>
-      <a class="nav-item" routerLink="/chat/settings"> <span class="icon">⚙️</span> Cài đặt </a>
-    </nav>
-    <div class="logout" (click)="logout()">🚪 Đăng xuất</div>
-  </aside>
+<div class="header">
+  <h1>Trang chủ</h1>
+  <div class="user-info" *ngIf="currentUser">
+    Xin chào, <strong>{{ currentUser.username }}</strong>
+  </div>
+</div>
 
-  <main class="main">
-    <div class="header">
-      <h1>Trang chủ</h1>
-      <div class="user-info" *ngIf="user$ | async as user">
-        Xin chào, <strong>{{ user?.username }}</strong>
+<div class="section">
+  <div class="section-title">
+    <span>👥 {{ total }} | Người dùng</span>
+  </div>
+
+  <div class="user-list" *ngIf="!loading; else loadingTpl">
+    <div class="user-row" *ngFor="let u of users">
+      <div class="avatar">{{ u.username[0].toUpperCase() }}</div>
+      <div class="info">
+        <p class="name">
+          {{ u.username }}
+          <span class="online-badge" *ngIf="u.isOnline">ON</span>
+          <span class="offline-badge" *ngIf="!u.isOnline">OFF</span>
+        </p>
+        <p class="email" *ngIf="u.isOnline">Đang trực tuyến</p>
+        <p class="email" *ngIf="!u.isOnline">{{ getLastSeen(u.lastSeen) }}</p>
       </div>
+      <button *ngIf="u.username != currentUser?.username" class="msg-btn" (click)="openChat(u.id)">
+        ✉️
+      </button>
     </div>
+  </div>
 
-    <div class="section">
-      <div class="section-title">
-        <span>👥 {{ total }} | Người dùng</span>
-      </div>
-
-      <div class="pagination" *ngIf="totalPages > 1">
-        <button (click)="changePage(page - 1)" [disabled]="page === 1">‹</button>
-        <span *ngFor="let p of [].constructor(totalPages); let i = index">
-          <button (click)="changePage(i + 1)" [class.active]="page === i + 1">{{ i + 1 }}</button>
-        </span>
-        <button (click)="changePage(page + 1)" [disabled]="page === totalPages">›</button>
-      </div>
-
-      <div class="user-list" *ngIf="!loading; else loadingTpl">
-        <div class="user-row" *ngFor="let u of users">
-          <div class="avatar">{{ u.username[0].toUpperCase() }}</div>
-          <div class="info">
-            <p class="name">
-              {{ u.username }}
-              <span class="online-badge" *ngIf="u.isOnline">ON</span>
-              <span class="offline-badge" *ngIf="!u.isOnline">OFF</span>
-            </p>
-            <p class="email" *ngIf="u.isOnline">Đang trực tuyến</p>
-            <p class="email" *ngIf="!u.isOnline">{{ getLastSeen(u.lastSeen) }}</p>
-          </div>
-          <button class="msg-btn" (click)="openChat(u.id)">✉️</button> <!-- ← thêm (click) -->
-        </div>
-      </div>
-
-      <ng-template #loadingTpl>
-        <p class="loading">Đang tải...</p>
-      </ng-template>
-    </div>
-  </main>
+  <ng-template #loadingTpl>
+    <p class="loading">Đang tải...</p>
+  </ng-template>
 </div>

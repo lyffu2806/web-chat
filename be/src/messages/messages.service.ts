@@ -10,8 +10,20 @@ export class MessagesService {
     private messagesRepository: Repository<Message>,
   ) {}
 
-  async sendMessage(senderId: string, receiverId: string, content: string) {
-    const message = this.messagesRepository.create({ senderId, receiverId, content });
+  async sendMessage(
+    senderId: string,
+    receiverId: string,
+    content: string,
+    type = 'text',
+    fileUrl?: string,
+  ) {
+    const message = this.messagesRepository.create({
+      senderId,
+      receiverId,
+      content,
+      type,
+      fileUrl,
+    });
     return this.messagesRepository.save(message);
   }
 
@@ -36,7 +48,6 @@ export class MessagesService {
       .orderBy('m.createdAt', 'DESC')
       .getMany();
 
-    // Lấy unique user từ conversations
     const seen = new Set<string>();
     const conversations: any[] = [];
 
@@ -44,12 +55,30 @@ export class MessagesService {
       const other = msg.senderId === userId ? msg.receiver : msg.sender;
       if (!seen.has(other.id)) {
         seen.add(other.id);
+        // Đếm unread
+        const unreadCount = await this.getUnreadCount(userId, other.id);
         conversations.push({
-          user: { id: other.id, username: other.username, isOnline: other.isOnline },
+          user: {
+            id: other.id,
+            username: other.username,
+            isOnline: other.isOnline,
+          },
           lastMessage: { content: msg.content, createdAt: msg.createdAt },
+          unreadCount,
         });
       }
     }
     return conversations;
+  }
+  async getUnreadCount(userId: string, senderId: string): Promise<number> {
+    return this.messagesRepository.count({
+      where: { senderId, receiverId: userId, isRead: false },
+    });
+  }
+  async markAsRead(userId: string, senderId: string): Promise<void> {
+    await this.messagesRepository.update(
+      { senderId, receiverId: userId, isRead: false },
+      { isRead: true },
+    );
   }
 }

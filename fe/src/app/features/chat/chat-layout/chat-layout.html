@@ -1,0 +1,25 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="logo">💬 ChatApp</div>
+    <nav>
+      <a class="nav-item" routerLink="/chat/home" routerLinkActive="active">
+        <span class="icon">🏠</span> Trang chủ
+      </a>
+      <a class="nav-item" routerLink="/chat/messages" routerLinkActive="active">
+        <span class="icon">✉️</span> Nhắn tin
+        <span class="nav-badge" *ngIf="totalUnread > 0">{{ totalUnread }}</span>
+      </a>
+      <a class="nav-item" routerLink="/chat/profile" routerLinkActive="active">
+        <span class="icon">👤</span> Cá nhân
+      </a>
+      <a class="nav-item" routerLink="/chat/settings" routerLinkActive="active">
+        <span class="icon">⚙️</span> Cài đặt
+      </a>
+    </nav>
+    <div class="logout" (click)="logout()">🚪 Đăng xuất</div>
+  </aside>
+
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

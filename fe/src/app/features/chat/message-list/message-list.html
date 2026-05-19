@@ -1,5 +1,4 @@
 <div class="messages-layout">
-
   <!-- Danh sách conversation bên trái -->
   <div class="conv-list">
     <div class="conv-header">💬 Tin nhắn</div>
@@ -18,12 +17,12 @@
         <p class="conv-name">{{ c.user.username }}</p>
         <p class="conv-last">{{ c.lastMessage.content }}</p>
       </div>
+      <span class="unread-badge" *ngIf="c.unreadCount > 0">{{ c.unreadCount }}</span>
     </div>
   </div>
 
   <!-- Chatbox bên phải -->
   <div class="chatbox" *ngIf="activeUser; else noChat">
-
     <!-- Header -->
     <div class="chat-header">
       <button class="back-btn" (click)="closeChat()">←</button>
@@ -32,7 +31,8 @@
         <span class="online-dot" *ngIf="activeUser.isOnline"></span>
       </div>
       <div class="header-info">
-        <p class="chat-name">{{ activeUser.username }}
+        <p class="chat-name">
+          {{ activeUser.username }}
           <span class="status-badge off" *ngIf="!activeUser.isOnline">OFF</span>
           <span class="status-badge on" *ngIf="activeUser.isOnline">ON</span>
         </p>
@@ -55,7 +55,7 @@
         </div>
         <div class="msg-content">
           <div class="bubble">{{ m.content }}</div>
-          <span class="time">{{ m.createdAt | date:'d \'Ngày Trước\'' }}</span>
+          <span class="time">{{ getMessageTime(m.createdAt) }}</span>
         </div>
       </div>
       <div #msgEnd></div>
@@ -80,11 +80,9 @@
         </div>
       </div>
     </div>
-
   </div>
 
   <ng-template #noChat>
     <div class="no-chat">Chọn một cuộc trò chuyện để bắt đầu</div>
   </ng-template>
-
 </div>

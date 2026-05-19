@@ -15,14 +15,19 @@ import { ChatModule } from './chat/chat.module';
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASS || '123456',
-      database: process.env.DB_NAME || 'chatting',
+      host: 'ep-holy-brook-ao4au6q4-pooler.c-2.ap-southeast-1.aws.neon.tech',
+      port: 5432,
+      username: 'neondb_owner',
+      password: 'npg_idsQ36vUnxqR',
+      database: 'neondb',
       entities: [User, Message],
-      synchronize: true, // chỉ dùng khi dev
-      ssl: { rejectUnauthorized: false },
+      synchronize: true,
+      ssl: true,
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
     }),
     AuthModule,
     UsersModule,

@@ -32,7 +32,7 @@ export class SocketService {
     this.socket = null;
   }
 
-  sendMessage(receiverId: string, content: string) {
-    this.socket?.emit('sendMessage', { receiverId, content });
+  sendMessage(receiverId: string, content: string, type = 'text') {
+    this.socket?.emit('sendMessage', { receiverId, content, type });
   }
 }

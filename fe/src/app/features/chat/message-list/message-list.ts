@@ -33,6 +33,7 @@ export class MessageList implements OnInit, OnDestroy {
   messages: any[] = [];
   newMessage = '';
   loading = false;
+  apiUrl = environment.apiUrl.replace('/api', '');
 
   ngOnInit() {
     // Decode JWT sync
@@ -173,4 +174,24 @@ export class MessageList implements OnInit, OnDestroy {
 
     return `${dateStr} ${timeStr}`;
   }
+  onFileSelected(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file || !this.activeUser) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  this.http
+    .post<{ url: string }>(`${environment.apiUrl}/messages/upload`, formData, {
+      headers: { Authorization: `Bearer ${this.token}` },
+    })
+    .subscribe((res) => {
+      // Gửi tin nhắn với fileUrl
+      const type = file.type.startsWith('image') ? 'image'
+                 : file.type.startsWith('video') ? 'video'
+                 : file.type.startsWith('audio') ? 'audio' : 'file';
+
+      this.socketService.sendMessage(this.activeUser.id, res.url, type);
+    });
+}
 }

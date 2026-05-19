@@ -54,7 +54,23 @@
           {{ activeUser.username[0].toUpperCase() }}
         </div>
         <div class="msg-content">
-          <div class="bubble">{{ m.content }}</div>
+          <div class="bubble">
+            <ng-container [ngSwitch]="m.type">
+              <img
+                *ngSwitchCase="'image'"
+                [src]="apiUrl + m.content"
+                style="max-width: 200px; border-radius: 8px"
+              />
+              <video
+                *ngSwitchCase="'video'"
+                [src]="apiUrl + m.content"
+                controls
+                style="max-width: 250px"
+              ></video>
+              <audio *ngSwitchCase="'audio'" [src]="apiUrl + m.content" controls></audio>
+              <span *ngSwitchDefault>{{ m.content }}</span>
+            </ng-container>
+          </div>
           <span class="time">{{ getMessageTime(m.createdAt) }}</span>
         </div>
       </div>
@@ -72,11 +88,14 @@
       <div class="input-actions">
         <button class="send-btn" (click)="sendMessage()">✈ Gửi</button>
         <div class="extra-btns">
-          <button>😊</button>
-          <button>🖼</button>
-          <button>🎬</button>
-          <button>🎵</button>
-          <button>🎤</button>
+          <input
+            #fileInput
+            type="file"
+            accept="image/*,video/*,audio/*"
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
+          <button (click)="fileInput.click()">🖼</button>
         </div>
       </div>
     </div>

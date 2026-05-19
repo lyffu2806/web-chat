@@ -1,5 +1,0 @@
-DB_HOST=ep-holy-brook-ao4au6q4.c-2.ap-southeast-1.aws.neon.tech
-DB_PORT=5432
-DB_USER=neondb_owner
-DB_PASS=npg_idsQ36vUnxqR
-DB_NAME=neondb

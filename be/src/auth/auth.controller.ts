@@ -1,4 +1,11 @@
-import { Controller, Post, Body, Get, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -7,7 +14,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  register(@Body() body: { email: string; username: string; password: string }) {
+  register(
+    @Body() body: { email: string; username: string; password: string },
+  ) {
     return this.authService.register(body.email, body.username, body.password);
   }
 
@@ -22,13 +31,13 @@ export class AuthController {
     return this.authService.getMe(req.user.sub);
   }
   @UseGuards(AuthGuard('jwt'))
-@Post('logout')
-logout(@Request() req: any) {
-  return this.authService.logout(req.user.sub);
-}
-@UseGuards(AuthGuard('jwt'))
-@Post('heartbeat')
-heartbeat(@Request() req: any) {
-  return this.authService.heartbeat(req.user.sub);
-}
+  @Post('logout')
+  logout(@Request() req: any) {
+    return this.authService.logout(req.user.sub);
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('heartbeat')
+  heartbeat(@Request() req: any) {
+    return this.authService.heartbeat(req.user.sub);
+  }
 }

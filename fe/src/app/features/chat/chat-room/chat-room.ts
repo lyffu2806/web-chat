@@ -2,9 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { environment } from '../../../../environments/environment';
+import { ChatService } from './services/index';
 
 @Component({
   selector: 'app-chat-room',
@@ -15,7 +14,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class ChatRoom implements OnInit, OnDestroy {
   private store = inject(Store);
-  private http = inject(HttpClient);
+  private chatService = inject(ChatService);
   private router = inject(Router);
 
   users: any[] = [];
@@ -42,15 +41,10 @@ export class ChatRoom implements OnInit, OnDestroy {
         } else {
           const token = localStorage.getItem('token');
           if (token) {
-            const payload = JSON.parse(atob(token.split('.')[1]));
             // Gọi API lấy username thật
-            this.http
-              .get<any>(`${environment.apiUrl}/users/me`, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
-              .subscribe((res) => {
-                this.currentUser = { username: res.username };
-              });
+            this.chatService.layThongTinUser().subscribe((res) => {
+              this.currentUser = { username: res.username };
+            });
           }
         }
       });
@@ -60,13 +54,7 @@ export class ChatRoom implements OnInit, OnDestroy {
     const sendHeartbeat = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
-      this.http
-        .post(
-          `${environment.apiUrl}/auth/heartbeat`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } },
-        )
-        .subscribe();
+      this.chatService.guiHeartbeat().subscribe();
     };
 
     sendHeartbeat();
@@ -79,19 +67,14 @@ export class ChatRoom implements OnInit, OnDestroy {
 
   loadUsers() {
     this.loading = true;
-    const token = localStorage.getItem('token');
-    this.http
-      .get<any>(`${environment.apiUrl}/users/online?page=${this.page}&limit=${this.limit}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .subscribe({
-        next: (res) => {
-          this.users = res.data;
-          this.total = res.total;
-          this.loading = false;
-        },
-        error: () => (this.loading = false),
-      });
+    this.chatService.danhSachUserOnline(this.page, this.limit).subscribe({
+      next: (res) => {
+        this.users = res.data;
+        this.total = res.total;
+        this.loading = false;
+      },
+      error: () => (this.loading = false),
+    });
   }
 
   get totalPages() {
@@ -109,25 +92,16 @@ export class ChatRoom implements OnInit, OnDestroy {
   }
 
   logout() {
-    const token = localStorage.getItem('token');
-    this.http
-      .post(
-        `${environment.apiUrl}/auth/logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
-      .subscribe({
-        next: () => {
-          localStorage.removeItem('token');
-          this.router.navigate(['/auth/login']);
-        },
-        error: () => {
-          localStorage.removeItem('token');
-          this.router.navigate(['/auth/login']);
-        },
-      });
+    this.chatService.dangXuat().subscribe({
+      next: () => {
+        localStorage.removeItem('token');
+        this.router.navigate(['/auth/login']);
+      },
+      error: () => {
+        localStorage.removeItem('token');
+        this.router.navigate(['/auth/login']);
+      },
+    });
   }
 
   getLastSeen(lastSeen: string): string {
